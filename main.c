@@ -207,6 +207,7 @@ int main(int argc, char *argv[]){
 	printf("3^7=%f (%f)\n",mpowl(3,7),pow(3,7));
 	*/
 	while ((m=getline(&line,&n,stdin))>0 && !feof(stdin)){
+		if (strchr(line,'(')) OP=bwd;
 		switch(OP){
 		case none:
 			a=read_number(line);

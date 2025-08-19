@@ -15,6 +15,19 @@ The input is taken from `stdin` and output is written to `stdout`.
 The error in parentheses affects the last digits of the number before
 it.
 
+```sh
+$ echo "1.2(1)" | ./concise -r
+1.2	0.1
+$ echo "1.2 0.1" | ./concise
+1.2(1)
+```
+
+The character between the two input numbers can be anything:
+```sh
+$ echo "1.2±0.001" | ./concise
+1.200(1)
+```
+
 ### Normal to Concise
 
 ```sh
