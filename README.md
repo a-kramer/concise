@@ -45,7 +45,7 @@ cat<<EOF
 1.23(09)
 1.897(13)E3
 EOF
-} | ./concise
+} | ./concise -r
 ```
 
 result:
