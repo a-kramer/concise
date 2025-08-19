@@ -48,40 +48,40 @@ printf "%${W1}s  %${W2}s  %${W2}s\n" "----" "------" "---------------"
 ## some reverse tests
 echo "concise notation to normal"
 v="1.2(2)E3"
-w=`echo "$v" | ./concise -r | tr '	' ' '`
+w=`echo "$v" | ./concise | tr '	' ' '`
 test_string_eq "$v" "$w" "1200 200"
 
 v="1.2(9)"
-w=`echo "$v" | ./concise -r | tr '	' ' '`
+w=`echo "$v" | ./concise | tr '	' ' '`
 test_string_eq "$v" "$w" "1.2 0.9"
 
 v="1.2(9)"
-w=`echo "$v" | ./concise -r --latex`
+w=`echo "$v" | ./concise --latex`
 test_string_eq "$v" "$w" "1.2\pm 0.9"
 
 v="1.2(9)E3"
-w=`echo "$v" | ./concise -r --latex`
+w=`echo "$v" | ./concise --latex`
 test_string_eq "$v" "$w" "(1.2\pm 0.9)\times 10^{3}"
 
 v="-1.2(9)E3"
-w=`echo "$v" | ./concise -r --latex`
+w=`echo "$v" | ./concise --latex`
 test_string_eq "$v" "$w" "(-1.2\pm 0.9)\times 10^{3}"
 
 v="-1.2(9)E-7"
-w=`echo "$v" | ./concise -r --latex`
+w=`echo "$v" | ./concise --latex`
 test_string_eq "$v" "$w" "(-1.2\pm 0.9)\times 10^{-7}"
 
 v="-1.200(189)E-7"
-w=`echo "$v" | ./concise -r --cross`
+w=`echo "$v" | ./concise --cross`
 test_string_eq "$v" "$w" "(-1.20±0.19)×10^{-7}"
 
 v="-1.200(189)E-7"
-w=`echo "$v" | ./concise -r --dot --parentheses`
+w=`echo "$v" | ./concise --dot --parentheses`
 test_string_eq "$v" "$w" "(-1.20±0.19)·10^(-7)"
 
 
 v="-1.200(189)E-7"
-w=`echo "$v" | ./concise -r --latex`
+w=`echo "$v" | ./concise --latex`
 test_string_eq "$v" "$w" "(-1.20\pm 0.19)\times 10^{-7}"
 
 echo "normal notation to concise"

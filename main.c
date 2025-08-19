@@ -8,7 +8,6 @@
 
 enum exponent_format {plain,parentheses, brackets, braces, mini};
 enum out_format {eE, asterisk, latex, cross, dot, table};
-enum op {none, fwd, bwd};
 const char *superscript[]={"⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹",".",NULL};
 
 int numeric(char c){
@@ -134,7 +133,7 @@ struct num read_concise(char *line){
 	char *ptr_u=line, *ptr_e=line;
 	int vscale=0;
 	double v=strtod(line,&ptr_u);
-	int u=11;
+	int u=0;
 	//int ulen=2;
 	char *decimal=strchr(line,'.');
 	int digits=ptr_u-(decimal?decimal:line)-1;
@@ -154,8 +153,14 @@ struct num read_number(char *line){
 	struct num a;
 	char *ptr=line;
 	a.value = strtod(line,&ptr);
+	char *decimal = strchr(line,'.');
+	int digits = decimal?(ptr-decimal-1):0;
 	while (ptr && *ptr && !numeric(*ptr)) ptr++;
-	a.error = strtod(ptr,NULL);
+	if (ptr && *ptr){
+		a.error = strtod(ptr,NULL);
+	} else {
+		a.error = pow(10,-digits);
+	}
 	return a;
 }
 
@@ -165,15 +170,10 @@ int main(int argc, char *argv[]){
 	ssize_t m;
 	int j;
 	struct num a;
-	enum op OP=fwd;
 	enum out_format OF=table;
 	enum exponent_format EF=plain;
 	for (j=1;j<argc;j++){
-		if (0==strcmp("-r",argv[j]) || 0==strcmp("--reverse",argv[j]) || 0==strcmp("--read",argv[j])) {
-			OP=bwd;
-		} else if (0==strcmp("-0",argv[j]) || 0==strcmp("--none",argv[j]) || 0==strcmp("--no-op",argv[j])) {
-			OP=none;
-		} else if (0==strcmp("--asterisk",argv[j]) || 0==strcmp("--star",argv[j]) || 0==strcmp("-*",argv[j])) {
+		if (0==strcmp("--asterisk",argv[j]) || 0==strcmp("--star",argv[j]) || 0==strcmp("-*",argv[j])) {
 			OF=asterisk;
 			EF=parentheses;
 		} else if (0==strcmp("--latex",argv[j]) || 0==strcmp("--LaTeX",argv[j]) || 0==strcmp("-\\",argv[j])) {
@@ -200,28 +200,13 @@ int main(int argc, char *argv[]){
 			fprintf(stderr,"[%s] unknown option: %s",__func__,argv[j]);
 		}
 	}
-	/*
-	printf("2^3=%f (%f)\n",mpowl(2,3),pow(2,3));
-	printf("2^0=%f (%f)\n",mpowl(2,0),pow(2,0));
-	printf("2^-3=%f (%f)\n",mpowl(2,-3),pow(2,-3));
-	printf("3^7=%f (%f)\n",mpowl(3,7),pow(3,7));
-	*/
 	while ((m=getline(&line,&n,stdin))>0 && !feof(stdin)){
-		if (strchr(line,'(')) OP=bwd;
-		switch(OP){
-		case none:
-			a=read_number(line);
-			print_number(a,OF,EF);
-			break;
-		case fwd:
-			a=read_number(line);
-			print_concise(a,OF,EF);
-			break;
-		case bwd:
+		if (strchr(line,'(')){
 			a=read_concise(line);
 			print_number(a,OF,EF);
-			break;
-		default: fprintf(stderr,"[%s] no opeartion.\n",__func__);
+		} else {
+			a=read_number(line);
+			print_concise(a,OF,EF);
 		}
 	}
 	return EXIT_SUCCESS;
