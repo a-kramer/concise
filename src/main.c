@@ -3,9 +3,6 @@
 #include <math.h>
 #include <string.h>
 
-//const double log10=2.302585;
-//const double log2=0.6931472;
-
 enum exponent_format {plain,parentheses, brackets, braces, mini};
 enum out_format {eE, asterisk, latex, cross, dot, table};
 const char *superscript[]={"⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹",".",NULL};
@@ -151,13 +148,22 @@ struct num read_concise(char *line){
 
 struct num read_number(char *line){
 	struct num a;
-	char *ptr=line;
-	a.value = strtod(line,&ptr);
+	char *p=line, *q;
+	a.value = strtod(line,&p);
 	char *decimal = strchr(line,'.');
-	int digits = decimal?(ptr-decimal-1):0;
-	while (ptr && *ptr && !numeric(*ptr)) ptr++;
-	if (ptr && *ptr){
-		a.error = strtod(ptr,NULL);
+	int digits = decimal?(p-decimal-1):0;
+	while (p && *p && !numeric(*p)) p++;
+	if (p && *p){
+		a.error = strtod(p,&q);
+		if (p==q) {
+			p[strlen(p)-1]='\0'; //chomp
+			fprintf(
+				stderr,
+				"[%s] reading the uncertainty failed (%f), " // longs tring
+				"perhaps this is a confusing delimiter: «%s».\n",
+				__func__,a.error,p);
+			exit(1);
+		}
 	} else {
 		a.error = pow(10,-digits);
 	}

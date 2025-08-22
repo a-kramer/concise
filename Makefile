@@ -1,5 +1,9 @@
-CC = gcc
+CC = cc
 CFLAGS = -Wfatal-errors -O2 -march=native 
+PREFIX = /usr/local/bin
+MANPREFIX = /usr/local/man/man1
+
+
 
 .PHONY: all test
 
@@ -12,3 +16,6 @@ concise: src/main.c
 
 test: concise
 	tests/test.sh
+
+install: concise
+	install $^ $(PREFIX) && install man/*.1 $(MANPREFIX)  && gzip -f $(MANPREFIX)/*.1
