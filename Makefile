@@ -7,8 +7,8 @@ CFLAGS = -Wfatal-errors -O2 -march=native
 all: concise
 
 
-concise: main.c
+concise: src/main.c
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 test: concise
-	./test.sh
+	tests/test.sh

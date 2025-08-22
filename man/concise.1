@@ -1,0 +1,145 @@
+.TH concise 1 "2022-03-17" "0.1" "rpn-math-package"
+.SH NAME
+concise - converts between plus-minus error notation and parenthesis error notation
+.SH SYNOPSIS
+.B echo
+"1.2 ± 0.1"
+.B | concise
+
+returns
+.I 1.2(1)
+;
+
+.SH DESCRIPTION
+.B concise
+will read lines with two number from
+.I stdin
+and convert the input into concise error notation, writing to
+.I stdout.
+The numbers are interpreted as value and uncertainty.
+
+If the input contains a parenthesis, it will (instead) be interpreted
+as already in concise notation and converted back to plus-minus
+notation, (two numbers).
+
+The output of the program can be more rich than the input. Any
+separator between two input numbers (value and uncertainty) is
+acceptable as long as it is not a number. Several characters can
+separate value and uncertainty. The sequence
+.I +-
+isn't a valid separator, because + and - can be parts of numbers. ±, tab, space, comma, semicolon, are all acceptable separators.
+
+For the purposes of this program, concise error notation is an integer
+in parentheses behind a floating point number, with no separator,
+indicating the uncertainty of the last digits of the value: 1.2(3) is
+the same as 1.2±0.3. But, 1.21(3) is more precise: 1.21±0.03. So, the
+number of given digits is significant. Similarly, 1.21(35) is the same
+as 1.21±0.35.
+
+.SH EXAMPLES
+
+Basic conversions:
+.EX
+$ echo '1.2(3)E4' | concise
+12000	3000
+.EE
+
+.EX
+$ echo '1.2E4±0.3E4' | concise
+1.2(3)E4
+.EE
+
+.SH OPTIONS
+
+Some Options affect the output structure, some affect minor details about the style of parentheses that are used.
+
+.SS Output Style
+.TP
+.B --asterisk, --star, -*
+Output is written using plain text math that is acceptable to most high-level languages:
+(1.2±0.3)*10^(4), you just have to make a choice about what
+.I ±
+means in the needed context.
+
+.TP
+.B --latex, -\\\\
+Output is formatted in a way that would be pasteable into LaTeX documents, but still fairly readable.
+
+.TP
+.B --cross, -x
+Output is formatted using plus-minus notation, but in parentheses, and a common base-10 magnitude is factored out, e.g.: (1.2±0.3)×10^{3}
+
+.TP
+.B --dot, -.
+Output is written using a centered dot instead of a cross, and exponents up to 99 are written using unicode mini-superscript characters, e.g.: (1.21±0.03)·10⁺⁰³, this is probably not very useful.
+
+.TP
+.B --plain, -E
+Exponents are written using the
+.I E
+notation, even when printing using plus-minus notation: 1.2(3)E4 = (1.2±0.3)E4; which is the same as (1.2±0.3)×10^{4}.
+
+.SS Choice of Parenthesis
+
+Not all output styles and exponent styles combined make sense and look
+good together. The style of delimiter for concise notation cannot be
+changed (always parentheses).
+
+.TP
+.B --parentheses, -(
+.TP
+.B --brackets, -[
+.TP
+.B --braces, -{
+Select the indicated type of delimiter for exponents, one of these: 10^(2), 10^[2], 10^{2}
+
+.TP
+.B --mini, -^
+unicode superscripts: ⁻⁺⁰¹²³···
+
+
+.SH MORE EXAMPLES
+
+For R:
+.EX
+$ echo '1.2(3)E4' | concise --star | sed -e 's/±/+c(+1,-1)*/'
+(1.2+c(+1,-1)*0.3)*10^(4)
+
+which in R creates the upper and lower bound:
+> x <- (1.2+c(+1,-1)*0.3)*10^(4)
+> print(x)
+[1] 15000  9000
+.EE
+
+For Octave:
+.EX
+$ echo '1.2(3)E4' | concise --star | sed -e 's/±/+[+1,-1]*/'
+(1.2+[+1,-1]*0.3)*10^(4)
+
+which in Octave creates the upper and lower bound:
+octave:1> x=(1.2+[+1,-1]*0.3)*10^(4)
+x =
+   15000    9000
+.EE
+
+Different separators:
+.EX
+$ echo "-1.9;0.001" | concise
+-1.900(1)
+
+$ echo "-1.9, 0.001" | concise
+-1.900(1)
+
+$ echo "-1.9—0.001" | concise 
+-1.900(1)
+
+$ echo "-1.9~0.001" | concise
+-1.900(1)
+
+$ echo "-1.9 stdv: 0.001" | concise
+-1.900(1)
+
+$ echo "-1.9@0.001" | concise
+-1.900(1)
+.EE
+
