@@ -4,7 +4,7 @@
 #include <string.h>
 
 enum exponent_format {plain,parentheses, brackets, braces, mini};
-enum out_format {eE, asterisk, latex, cross, dot, table};
+enum out_format {eE, asterisk, latex, siunitx, cross, dot, table};
 const char *superscript[]={"⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸","⁹",".",NULL};
 
 int numeric(char c){
@@ -44,6 +44,10 @@ double mpowl(double b, int n){
 }
 
 void print_concise(struct num x, enum out_format OF, enum exponent_format EF){
+	if (OF == siunitx){
+		printf("\\num{%g +- %g}\n",x.v,x.u);
+		return;
+	}
 	int vscale=round(log10(fabs(x.value)));
 	int uscale=floor(log10(fabs(x.error)));
 	int d=vscale-uscale+1;
@@ -185,6 +189,8 @@ int main(int argc, char *argv[]){
 		} else if (0==strcmp("--latex",argv[j]) || 0==strcmp("--LaTeX",argv[j]) || 0==strcmp("-\\",argv[j])) {
 			OF=latex;
 			EF=braces;
+		} else if (0==strcmp("--siunitx",argv[j])) {
+			OF=siunitx;
 		} else if (0==strcmp("--cross",argv[j]) || 0==strcmp("--times",argv[j]) || 0==strcmp("-x",argv[j])) {
 			OF=cross;
 			EF=braces;

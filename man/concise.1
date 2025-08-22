@@ -51,7 +51,7 @@ $ echo '1.2E4±0.3E4' | concise
 
 .SH OPTIONS
 
-Some Options affect the output structure, some affect minor details about the style of parentheses that are used.
+Some Options affect the output structure, some affect minor details about the style of parentheses that are used. The default separator for value and uncertainty (on output) is a single tab, e.g.: "0.00012	0.3e-5". The following options change that behaviour:
 
 .SS Output Style
 .TP
@@ -63,21 +63,21 @@ means in the needed context.
 
 .TP
 .B --latex, -\\\\
-Output is formatted in a way that would be pasteable into LaTeX documents, but still fairly readable.
+Output is formatted in a way that would be pasteable into LaTeX documents, but still fairly readable: (1.2\\pm 0.3)\\times 10^{-4}
 
 .TP
 .B --cross, -x
-Output is formatted using plus-minus notation, but in parentheses, and a common base-10 magnitude is factored out, e.g.: (1.2±0.3)×10^{3}
+Output is formatted using plus-minus notation, but in parentheses, and a common base-10 magnitude is factored out, e.g.: (1.2±0.3)×10^{-4}
 
 .TP
 .B --dot, -.
-Output is written using a centered dot instead of a cross, and exponents up to 99 are written using unicode mini-superscript characters, e.g.: (1.21±0.03)·10⁺⁰³, this is probably not very useful.
+Output is written using a centered dot instead of a cross, and exponents up to 99 are written using unicode mini-superscript characters, e.g.: (1.21±0.03)·10⁺⁰³.
 
 .TP
 .B --plain, -E
 Exponents are written using the
 .I E
-notation, even when printing using plus-minus notation: 1.2(3)E4 = (1.2±0.3)E4; which is the same as (1.2±0.3)×10^{4}.
+notation, even when printing using plus-minus notation: 1.2(3)E4 = (1.2±0.3)E4;
 
 .SS Choice of Parenthesis
 
@@ -87,9 +87,9 @@ changed (always parentheses).
 
 .TP
 .B --parentheses, -(
-.TP
+.TQ
 .B --brackets, -[
-.TP
+.TQ
 .B --braces, -{
 Select the indicated type of delimiter for exponents, one of these: 10^(2), 10^[2], 10^{2}
 
@@ -100,7 +100,7 @@ unicode superscripts: ⁻⁺⁰¹²³···
 
 .SH MORE EXAMPLES
 
-For R:
+. B R:
 .EX
 $ echo '1.2(3)E4' | concise --star | sed -e 's/±/+c(+1,-1)*/'
 (1.2+c(+1,-1)*0.3)*10^(4)
@@ -111,7 +111,7 @@ which in R creates the upper and lower bound:
 [1] 15000  9000
 .EE
 
-For Octave:
+.B Octave:
 .EX
 $ echo '1.2(3)E4' | concise --star | sed -e 's/±/+[+1,-1]*/'
 (1.2+[+1,-1]*0.3)*10^(4)
@@ -122,7 +122,7 @@ x =
    15000    9000
 .EE
 
-Different separators:
+.B Different separators:
 .EX
 $ echo "-1.9;0.001" | concise
 -1.900(1)
@@ -143,3 +143,14 @@ $ echo "-1.9@0.001" | concise
 -1.900(1)
 .EE
 
+.SH BUGS
+
+"GitHub-Issues"
+.UR https://github.com/a-kramer/concise
+.UE
+
+.SH AUTHOR
+
+"Andrei-Kramer"
+.MT andrei.kramer@scilifelab.se
+.ME
