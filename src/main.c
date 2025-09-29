@@ -48,8 +48,8 @@ void print_concise(struct num x, enum out_format OF, enum exponent_format EF){
 		printf("\\num{%g +- %g}\n",x.v,x.u);
 		return;
 	}
-	int vscale=round(log10(fabs(x.value)));
-	int uscale=floor(log10(fabs(x.error)));
+	int vscale=floor(log10(fabs(x.value+1e-8)));
+	int uscale=floor(log10(fabs(x.error+1e-8)));
 	int d=vscale-uscale+1;
 	double v=x.value*pow(10,-vscale);
 	int u=x.error*pow(10,1-uscale);
